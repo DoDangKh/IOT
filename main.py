@@ -13,7 +13,7 @@ from matplotlib import animation
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
-
+import sendemail
 from xls import writedata
 
 config = {
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     label.grid(column=0, row=0)
     label2 = tk.Label(root, text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()), font=("Arial", 30))
     label2.grid(column=1, row=0)
-
+    b=tk.Button(text="Gui Mail", command=sendemail.sendmail(retrivedata('DUST').val(), retrivedata('SOUND').val()))
     # t = tk.Text(root, height=1, width=20, font=("Arial", 30))
     # t.grid(column=1, row=1)
 
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     # b=tk.Button(root,text="Cập Nhật Dữ Liệu",command=lambda: senddata(t.get("1.0","end-1c")),font=("Arial",30))
 
     # b.grid(column=0,row=2,columnspan=2)
+    b.grid(column=1,row=1)
     y=0
     x_values = []
     x2_values=[]
@@ -98,9 +99,9 @@ if __name__ == "__main__":
 
         print(retrivedata('SOUND').val())
         label.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()))
-        label2.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("DUST").val()))
+        label2.config(text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()))
         plt.close(figure)
-        root.after(500, update)
+        root.after(200, update)
     # y=0
     # x_values = [0]
     # y_values = [0]

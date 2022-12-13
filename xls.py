@@ -12,8 +12,9 @@ def writedata(sound,dust):
     wb= load_workbook(filename=r"C:\Users\Khoa\PycharmProjects\IOT\data.xlsx")
     ws=wb["Sheet1"]
     print(wb.sheetnames)
-    lastrow=ws.max_row
+    lastrow=ws.max_row+1
     ws.cell(row=lastrow,column=1).value=day
     ws.cell(row=lastrow,column=2).value=current
     ws.cell(row=lastrow,column=3).value=sound
     ws.cell(row=lastrow,column=4).value=dust
+    wb.save("data.xlsx")
