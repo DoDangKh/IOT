@@ -3,11 +3,19 @@ import  tkinter as tk
 #import tkinter as tk
 import PyPDF2
 import PIL
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import random
+import numpy as np
 from datetime import datetime
+from itertools import count
+
+from matplotlib import animation
+from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
+
+from xls import writedata
+
 config = {
     "apiKey": "AIzaSyAYFuYoE2-8V6xxbm_ba0zwVfBCEv25KBQ",
     "authDomain": "arduino-1e690.firebaseapp.com",
@@ -22,10 +30,10 @@ config = {
 # def millitime()
 #    return round(time.time()*1000)
 
-def retrivedata():
+def retrivedata(str):
 
     # DOC DU LIEU TU CLOUD
-    data = db.child("SOUND").get()
+    data = db.child(str).get()
     # print(data.val())
     return data
     # GHI DU LIEU LEN CLOUD
@@ -36,6 +44,8 @@ def senddata(data):
     db.update({"SOUND": int(data)})
 
 
+
+
 if __name__ == "__main__":
     firebase = pyrebase.initialize_app(config)
     db = firebase.database()
@@ -43,8 +53,10 @@ if __name__ == "__main__":
     root = tk.Tk()
     canvas = tk.Canvas(root, width=600, height=600)
     canvas.grid(columnspan=3,rowspan=2)
-    label = tk.Label(root, text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata().val()), font=("Arial", 30))
+    label = tk.Label(root, text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()), font=("Arial", 30))
     label.grid(column=0, row=0)
+    label2 = tk.Label(root, text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()), font=("Arial", 30))
+    label2.grid(column=1, row=0)
 
     # t = tk.Text(root, height=1, width=20, font=("Arial", 30))
     # t.grid(column=1, row=1)
@@ -52,33 +64,42 @@ if __name__ == "__main__":
     # label2 = tk.Label(root, text="Cường Độ Gửi Đến FireBase:", font=("Arial", 30))
     # label2.grid(column=0, row=1)
 
-    b=tk.Button(root,text="Cập Nhật Dữ Liệu",command=lambda: senddata(t.get("1.0","end-1c")),font=("Arial",30))
+    # b=tk.Button(root,text="Cập Nhật Dữ Liệu",command=lambda: senddata(t.get("1.0","end-1c")),font=("Arial",30))
 
-    b.grid(column=0,row=2,columnspan=2)
+    # b.grid(column=0,row=2,columnspan=2)
     y=0
     x_values = []
+    x2_values=[]
     y_values = []
-    figure = pyplot.figure()
+    index=count()
     def update():
-
-
-        x = random.randint(0, 10);
+        figure = plt.figure()
+        x = retrivedata("SOUND").val();
+        x2=retrivedata("DUST").val();
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S.%f")[:-3]
         x_values.append(x)
-        y_values.append(current_time)
+        x2_values.append(x2)
+        y_values.append(next(index))
         global  y
         y += 1
         print(y)
-
-        figure.add_subplot().plot(y_values, x_values)
+        writedata(retrivedata("SOUND").val(),retrivedata("DUST").val())
+        figure.add_subplot(121).plot(y_values, x_values)
+        plt.grid()
+        plt.xlim(y - 5, y)
+        plt.ylim(x-5,x+5)
+        figure.add_subplot(122).plot(y_values, x2_values)
+        plt.grid()
+        plt.xlim(y - 5, y)
+        plt.ylim(x2-5,x2+5)
         chart = FigureCanvasTkAgg(figure, root)
         chart.get_tk_widget().grid(row=1, column=0)
-        pyplot.grid()
-        pyplot.xlim(y-5,y)
-        pyplot.ylim(0,10)
-        print(retrivedata().val())
-        label.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata().val()))
+
+        print(retrivedata('SOUND').val())
+        label.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()))
+        label2.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("DUST").val()))
+        plt.close(figure)
         root.after(500, update)
     # y=0
     # x_values = [0]
@@ -106,6 +127,5 @@ if __name__ == "__main__":
 
 
     root.mainloop()
-
 
 
