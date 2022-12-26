@@ -13,6 +13,8 @@ from matplotlib import animation
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
+
+import MachineLearning
 import sendemail
 from xls import writedata
 
@@ -51,13 +53,17 @@ if __name__ == "__main__":
     db = firebase.database()
 
     root = tk.Tk()
-    canvas = tk.Canvas(root, width=600, height=600)
-    canvas.grid(columnspan=3,rowspan=2)
-    label = tk.Label(root, text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()), font=("Arial", 30))
+    frame1= tk.Frame(root)
+    frame1.grid(column=0,row=0)
+    frame2=tk.Frame(root)
+    frame2.grid(column=0,row=1)
+    frame3=tk.Frame(root)
+    frame3.grid(column=0,row=2)
+    label = tk.Label(frame1, text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()), font=("Arial", 30))
     label.grid(column=0, row=0)
-    label2 = tk.Label(root, text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()), font=("Arial", 30))
+    label2 = tk.Label(frame1, text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()), font=("Arial", 30))
     label2.grid(column=1, row=0)
-    b=tk.Button(text="Gui Mail", command=sendemail.sendmail(retrivedata('DUST').val(), retrivedata('SOUND').val()))
+    b=tk.Button(frame3,text="Gui Mail", command=lambda: sendemail.sendmail(retrivedata('DUST').val(), retrivedata('SOUND').val()))
     # t = tk.Text(root, height=1, width=20, font=("Arial", 30))
     # t.grid(column=1, row=1)
 
@@ -67,14 +73,21 @@ if __name__ == "__main__":
     # b=tk.Button(root,text="Cập Nhật Dữ Liệu",command=lambda: senddata(t.get("1.0","end-1c")),font=("Arial",30))
 
     # b.grid(column=0,row=2,columnspan=2)
-    b.grid(column=1,row=1)
+    b.grid(column=0,row=0)
+    b2=tk.Button(frame3,text='Xuat File Du Doan Ket Xe',command=lambda: MachineLearning.create_report_file())
+    b2.grid(column=1,row=0)
+    b3=tk.Button(frame3,text='Gui Mail Du Doan', command=lambda: MachineLearning.send_mail() )
+    b3.grid(column=2,row=0)
+    b4=tk.Button(frame3,text='train ai',command=lambda :MachineLearning.train())
+    b4.grid(column=4,row=0)
     y=0
     x_values = []
     x2_values=[]
     y_values = []
     index=count()
+    figure = plt.figure()
     def update():
-        figure = plt.figure()
+        figure.clear()
         x = retrivedata("SOUND").val();
         x2=retrivedata("DUST").val();
         now = datetime.now()
@@ -94,14 +107,13 @@ if __name__ == "__main__":
         plt.grid()
         plt.xlim(y - 5, y)
         plt.ylim(x2-5,x2+5)
-        chart = FigureCanvasTkAgg(figure, root)
+        chart = FigureCanvasTkAgg(figure, frame2)
         chart.get_tk_widget().grid(row=1, column=0)
 
         print(retrivedata('SOUND').val())
         label.config(text="Cường Độ Âm Thanh Đang Là:" + str(retrivedata("SOUND").val()))
         label2.config(text="Cường Độ Bui Đang Là:" + str(retrivedata("DUST").val()))
-        plt.close(figure)
-        root.after(200, update)
+        frame2.after(500, update)
     # y=0
     # x_values = [0]
     # y_values = [0]
